@@ -11,6 +11,9 @@
 #include <iostream>
 #include <map>
 #include <list>
+#include <unordered_map>
+#include <functional>
+#include <optional>
 
 enum class Side
 {
