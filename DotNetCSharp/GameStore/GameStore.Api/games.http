@@ -15,6 +15,17 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:5026/games
+Content-Type: application/json
+
+{
+    "name": "BadRequest",
+    "genre": "Battle-Royale",
+    "price": 199.00,
+    "releaseDate": "2022-08-11"
+}
+
+###
 PUT http://localhost:5026/games/1
 Content-Type: application/json
 
@@ -24,6 +35,18 @@ Content-Type: application/json
     "price": 9.99,
     "releaseDate": "1992-07-15"
 }
+
+###
+PUT http://localhost:5026/games/1
+Content-Type: application/json
+
+{
+    "name": "BadPutRequest",
+    "genre": "",
+    "price": 999.99,
+    "releaseDate": "1992-07-15"
+}
+
 
 ###
 DELETE http://localhost:5026/games/1
