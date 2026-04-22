@@ -1,0 +1,29 @@
+# ── .NET / C# ──────────────────────────────
+**/bin/
+**/obj/
+**/packages/
+**/TestResults/
+**/publish/
+**/*.nupkg
+**/*.snupkg
+**/*.user
+
+# ── IDE ────────────────────────────────────
+**/.vs/
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.suo
+
+# ── Secrets ────────────────────────────────
+.env
+.env.*
+**/appsettings.Development.json
+**/*secrets*.json
+
+# ── OS ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
