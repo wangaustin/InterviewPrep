@@ -1,7 +1,7 @@
 GET http://localhost:5026/games
 
 ###
-GET http://localhost:5026/games/5
+GET http://localhost:5026/games/1
 
 ###
 POST http://localhost:5026/games
@@ -9,8 +9,8 @@ Content-Type: application/json
 
 {
     "name": "Rumbleverse",
-    "genre": "Battle-Royale",
-    "price": 0.00,
+    "genreId": 1,
+    "price": 9.00,
     "releaseDate": "2022-08-11"
 }
 
@@ -19,8 +19,30 @@ POST http://localhost:5026/games
 Content-Type: application/json
 
 {
+    "name": "The Last of Us I Remastered",
+    "genreId": 1,
+    "price": 59.99,
+    "releaseDate": "2024-06-05"
+}
+
+###
+POST http://localhost:5026/games
+Content-Type: application/json
+
+{
+    "name": "Bad Game",
+    "genreId": 3,
+    "price": 29.99,
+    "releaseDate": "2026-04-17"
+}
+
+###
+POST http://localhost:5026/games
+Content-Type: application/json
+
+{
     "name": "BadRequest",
-    "genre": "Battle-Royale",
+    "genre": 1,
     "price": 199.00,
     "releaseDate": "2022-08-11"
 }
@@ -31,22 +53,25 @@ Content-Type: application/json
 
 {
     "name": "Street Fighter II Turbo",
-    "genre": "Fighting",
+    "genre": 1,
     "price": 9.99,
     "releaseDate": "1992-07-15"
 }
 
 ###
-PUT http://localhost:5026/games/1
+PUT http://localhost:5026/games/2
 Content-Type: application/json
 
 {
-    "name": "BadPutRequest",
-    "genre": "",
-    "price": 999.99,
-    "releaseDate": "1992-07-15"
+    "name": "The Last of Us I Remastered",
+    "genreId": 2,
+    "price": 59.99,
+    "releaseDate": "2024-06-08"
 }
 
 
 ###
-DELETE http://localhost:5026/games/1
+DELETE http://localhost:5026/games/3
+
+###
+GET http://localhost:5026/genres
