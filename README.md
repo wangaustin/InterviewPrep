@@ -6,3 +6,6 @@ Hand-coded solutions and technical post-mortems focused on algorithmic growth an
 
 ## Python
 1. TBD
+
+## .NET, C#
+1. Game Store Full-Stack
