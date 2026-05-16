@@ -1,6 +1,7 @@
-#include <iostream>
 #include <list>
 #include <map>
+#include <algorithm>
+#include <iostream>
 
 enum class Side
 {
@@ -10,10 +11,10 @@ enum class Side
 
 struct Order
 {
-    int id;
-    Side side;
-    int price;
-    int qty;
+  int id;
+  Side side;
+  int price;
+  int qty;  
 };
 
 struct Level
@@ -32,21 +33,22 @@ struct OrderRef
 class OrderBook
 {
 public:
-
     void add(int id, Side side, int price, int qty)
     {
-        Order incoming{id, side, price, qty};
+        // if quantity is zero or if an order of that id already exists, return
+        if (qty <= 0 || order_index_.count(id)) return;
 
-        if (side ==Side::Buy)
-        {
-            match_sell(incoming);
-        }
-        else
+        Order incoming{id, side, price, qty};
+        if (side == Side::Buy)
         {
             match_buy(incoming);
         }
+        else
+        {
+            match_sell(incoming);
+        }
 
-        if (incoming.qty > 0)
+        if (incoming.qty >= 0)
         {
             add_resting(incoming);
         }
@@ -55,11 +57,12 @@ public:
     void cancel(int id)
     {
         auto it = order_index_.find(id);
+
         if (it == order_index_.end()) return;
 
         const OrderRef& ref = it->second;
 
-        if (it->second.side == Side::Buy)
+        if (ref.side == Side::Buy)
         {
             auto level_it = bids_.find(ref.price);
             if (level_it != bids_.end())
@@ -73,7 +76,7 @@ public:
                 }
             }
         }
-        else
+        else // Side::Sell
         {
             auto level_it = asks_.find(ref.price);
             if (level_it != asks_.end())
@@ -87,7 +90,8 @@ public:
                 }
             }
         }
-        order_index_.erase(id);
+
+        order_index_.erase(it);
     }
 
     std::optional<int> best_bid() const
@@ -106,46 +110,50 @@ public:
 
     void print_book() const
     {
-        std::cout << "Asks: " << "\n";
+        std::cout << "Asks:\n";
+
         for (const auto& [price, level] : asks_)
         {
-            std:: cout << price << " x " << level.total_qty << "\n";
+            std::cout << price << " x " << level.total_qty << "\n";
         }
-        std::cout << "Bids: " << "\n";
+        
+        std::cout << "\n";
+
+        std::cout << "Bids:\n";
+
         for (const auto& [price, level] : bids_)
         {
-            std:: cout << price << " x " << level.total_qty << "\n";
+            std::cout << price << " x " << level.total_qty << "\n";
         }
     }
 
 private:
     std::map<int, Level, std::greater<int>> bids_; // descending
     std::map<int, Level, std::less<int>> asks_; // ascending
-    std::unordered_map<int, OrderRef> order_index_; // id -> OrderRef
+    std::unordered_map<int, OrderRef> order_index_; // id -> order_ref
 
+    // add resting order
     void add_resting(const Order& order)
     {
         if (order.side == Side::Buy)
         {
             auto& level = bids_[order.price];
             level.orders.push_back(order);
-            level.total_qty += order.qty;
-
             auto it = std::prev(level.orders.end());
+            level.total_qty += order.qty;
             order_index_[order.id] = OrderRef{order.side, order.price, it};
         }
         else
         {
             auto& level = asks_[order.price];
             level.orders.push_back(order);
-            level.total_qty += order.qty;
-
             auto it = std::prev(level.orders.end());
+            level.total_qty += order.qty;
             order_index_[order.id] = OrderRef{order.side, order.price, it};
         }
     }
 
-    // buy -> match with asks
+    // buy -> look for asks
     void match_buy(Order& incoming)
     {
         while (incoming.qty > 0 && !asks_.empty())
@@ -153,7 +161,7 @@ private:
             auto best_ask_it = asks_.begin();
             int ask_price = best_ask_it->first;
 
-            // break when ask has gone above what we're willing to buy
+            // ask price has gone beyond what we're willing to buy
             if (ask_price > incoming.price) break;
 
             auto& level = best_ask_it->second;
@@ -170,7 +178,7 @@ private:
                 if (order_it->qty == 0)
                 {
                     order_index_.erase(order_it->id);
-                    order_it = level.orders.erase(order_it);
+                    order_it = level.orders.erase(order_it); // erase returns iterator to next element
                 }
                 else
                 {
@@ -185,7 +193,7 @@ private:
         }
     }
 
-    // sell -> match for bids
+    // sell -> look for bids
     void match_sell(Order& incoming)
     {
         while (incoming.qty > 0 && !bids_.empty())
@@ -193,7 +201,7 @@ private:
             auto best_bid_it = bids_.begin();
             int bid_price = best_bid_it->first;
 
-            // break when bid has gone below what we're willing to sell for
+            // bid price has gone below what we're willing to sell for
             if (bid_price < incoming.price) break;
 
             auto& level = best_bid_it->second;
